@@ -3,7 +3,8 @@ import math
 import pygame
 
 import os
-# s
+
+
 class Paddle(pygame.sprite.Sprite):
     VEL = 10
 
