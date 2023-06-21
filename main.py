@@ -14,6 +14,7 @@ class Paddle(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('img/paddle.png')
         self.rect = self.image.get_rect()
+
         self.width = self.rect[2]
         self.height = self.rect[3]
         self.rect.center = (WIDTH // 2, HEIGHT - self.height)
@@ -176,7 +177,7 @@ def generate_bricks():
     width = brick.width
     height = brick.height
     windowSize = pygame.display.get_window_size()
-    bricksMap = levels(3)
+    bricksMap = levels(5)
     cols = len(bricksMap[0])
     rows = len(bricksMap)
     gap = (windowSize[0] - (width * cols)) // (cols + 1)
@@ -187,7 +188,7 @@ def generate_bricks():
     for row in range(rows):
         for col in range(cols):
             x = gap + col * (width + gap)
-            y = gap + row * (height + gap)
+            y = 5 + row * (height + 5)
             if bricksMap[row][col]:
                 brick = Brick(x, y, 2)
                 all_sprites.add(brick)
@@ -203,11 +204,11 @@ game_folder = os.path.dirname(__file__)
 
 img_folder = os.path.join(game_folder, 'img')
 
-background_img = pygame.image.load(os.path.join(img_folder, 'back1.jpg'))
+background_img = pygame.image.load(os.path.join(img_folder, 'back2.png'))
 
 pygame.init()
 
-WIDTH, HEIGHT = 1500, 600
+WIDTH, HEIGHT = 800, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("brick breaker")
 
@@ -233,8 +234,8 @@ def main():
     lives = 3
 
     def reset():
-        ball.x = WIDTH / 2
-        ball.y = paddle.rect.y - BALL_RADIUS
+        ball.set_positions(paddle.rect.centerx, paddle.rect.y - ball.radius)
+        ball.VEL = 0
 
     def display_text(text):
         text_render = LIVES_FONT.render(text, 1, "red")
@@ -302,6 +303,7 @@ def main():
             lives = 3
             reset()
             display_text("You Won!")
+            print(ball.y)
 
 
 
