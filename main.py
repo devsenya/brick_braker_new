@@ -1,10 +1,11 @@
 import math
+from typing import Tuple
 
 import pygame
 
 import os
 
-from level_1 import bricksMap
+from level_1 import levels
 
 class Paddle(pygame.sprite.Sprite):
     VEL = 10
@@ -175,18 +176,21 @@ def generate_bricks():
     width = brick.width
     height = brick.height
     windowSize = pygame.display.get_window_size()
-    cols = windowSize[0] // width
-    gap = (windowSize[0] % width) // cols
-    rows = 4
+    bricksMap = levels(3)
+    cols = len(bricksMap[0])
+    rows = len(bricksMap)
+    gap = (windowSize[0] - (width * cols)) // (cols + 1)
+
     if len(all_sprites) > 0:
         for i in all_sprites:
             all_sprites.remove(i)
     for row in range(rows):
         for col in range(cols):
-            x = col * (width + gap)
-            y = row * (height + gap) + 150
-            brick = Brick(x, y, 2)
-            all_sprites.add(brick)
+            x = gap + col * (width + gap)
+            y = gap + row * (height + gap)
+            if bricksMap[row][col]:
+                brick = Brick(x, y, 2)
+                all_sprites.add(brick)
 
             print(x, y)
     print(all_sprites)
@@ -199,11 +203,11 @@ game_folder = os.path.dirname(__file__)
 
 img_folder = os.path.join(game_folder, 'img')
 
-background_img = pygame.image.load(os.path.join(img_folder, 'background.png'))
+background_img = pygame.image.load(os.path.join(img_folder, 'back1.jpg'))
 
 pygame.init()
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1500, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("brick breaker")
 
