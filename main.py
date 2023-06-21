@@ -4,6 +4,7 @@ import pygame
 
 import os
 
+from level_1 import bricksMap
 
 class Paddle(pygame.sprite.Sprite):
     VEL = 10
