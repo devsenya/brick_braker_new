@@ -177,7 +177,7 @@ def generate_bricks():
     width = brick.width
     height = brick.height
     windowSize = pygame.display.get_window_size()
-    bricksMap = levels(5)
+    bricksMap = levels(3)
     cols = len(bricksMap[0])
     rows = len(bricksMap)
     gap = (windowSize[0] - (width * cols)) // (cols + 1)
