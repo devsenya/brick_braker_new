@@ -7,6 +7,7 @@ import os
 
 from level_1 import levels
 
+
 class Paddle(pygame.sprite.Sprite):
     VEL = 10
 
@@ -54,6 +55,26 @@ class Ball:
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 
+def ball_floor_collision(balls, paddle):
+    global lives
+    for ball in balls:
+        if ball.y + ball.radius >= HEIGHT:
+            balls.remove(ball)
+            if len(balls) <= 0:
+                lives -= 1
+                # центровка площади после потери жизни
+                # paddle.rect.centerx = WIDTH // 2
+
+                bonus_plus_ball(ball := Ball(paddle.rect.centerx, paddle.rect.y - ball.radius, BALL_RADIUS, "white"),
+                                mass_balls)
+                ball.VEL = 0
+                ball.set_vel(0, ball.VEL * -1)
+
+
+def bonus_plus_ball(ball, mass):
+    mass.append(ball)
+
+
 class Brick(pygame.sprite.Sprite):
     def __init__(self, x, y, health):
         pygame.sprite.Sprite.__init__(self)
@@ -65,7 +86,6 @@ class Brick(pygame.sprite.Sprite):
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
 
-
         # # уменьшим размер кирпичика
         # self.image = pygame.transform.scale(self.image, (self.image.get_width() // 2, self.image.get_height() // 2))
 
@@ -74,10 +94,7 @@ class Brick(pygame.sprite.Sprite):
         self.health = health
         self.max_health = health
 
-        self.rect.center = (x + self.width//2, y + self.height//2)
-
-
-
+        self.rect.center = (x + self.width // 2, y + self.height // 2)
 
     def draw(self, win):
         # pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
@@ -106,12 +123,6 @@ class Brick(pygame.sprite.Sprite):
             self.hit()
             ball.set_vel(ball.x_vel * -1, ball.y_vel)
             return True
-        # if (ball.y + ball.radius >= self.rect.y) and (ball.y + ball.radius < self.rect.y + self.height) and (
-        #         self.rect.x < ball.x < self.rect.x + self.width):
-        #     print(" удар сверху")
-        #     self.hit()
-        #     ball.set_vel(ball.x_vel, ball.y_vel * -1)
-        #     return True
         if (self.rect.y <= ball.y + ball.radius < self.rect.y + self.height) and (
                 self.rect.x - ball.radius < ball.x < self.rect.x + self.width + ball.radius):
             print(" удар сверху")
@@ -130,11 +141,13 @@ class Brick(pygame.sprite.Sprite):
         self.image = self.images[self.index]
 
 
-def draw(win, paddle, ball, bricks, lives, background):
+def draw(win, paddle, balls, bricks, lives, background):
     win.fill("white")
     win.blit(background, background.get_rect())
     paddle.draw(win)
-    ball.draw(win)
+    # ball.draw(win)
+    for x in balls:
+        x.draw(win)
     bricks.draw(win)
 
     lives_text = LIVES_FONT.render(f"Lives: {lives}", 1, "white")
@@ -217,33 +230,32 @@ BALL_RADIUS = 10
 
 LIVES_FONT = pygame.font.SysFont("comicsans", 40)
 
-
 all_sprites = pygame.sprite.Group()
 paddle_sprite = pygame.sprite.Group()
 
-
+mass_balls = []
+lives = 3
 
 def main():
+    global lives
     clock = pygame.time.Clock()
 
     paddle = Paddle()
 
-    ball = Ball(WIDTH / 2, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white")
+    mass_balls.append(Ball(WIDTH / 2, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"))
     generate_bricks()
     paddle_sprite.add(paddle)
-    lives = 3
+
 
     def reset():
-        ball.set_positions(paddle.rect.centerx, paddle.rect.y - ball.radius)
-        ball.VEL = 0
+        mass_balls[0].set_positions(paddle.rect.centerx, paddle.rect.y - mass_balls[0].radius)
+        mass_balls[0].VEL = 0
 
     def display_text(text):
         text_render = LIVES_FONT.render(text, 1, "red")
         win.blit(text_render, (WIDTH / 2 - text_render.get_width() / 2, HEIGHT / 2 - text_render.get_height() / 2))
         pygame.display.update()
         pygame.time.delay(3000)
-
-
 
     run = True
     while run:
@@ -262,35 +274,32 @@ def main():
             if keys[pygame.K_RIGHT] and paddle.rect.x + paddle.VEL + paddle.width <= WIDTH:
                 paddle.move(1)
             # если скорость = 0 -> следуем за paddle
-            if ball.VEL == 0:
+            if len(mass_balls) == 1 and mass_balls[0].VEL == 0:
                 print("sdfsdfsdfsdfsdfsdfsdfdfsdf")
-                ball.set_positions(paddle.rect.centerx, paddle.rect.y - ball.radius)
+                mass_balls[0].set_positions(paddle.rect.centerx, paddle.rect.y - mass_balls[0].radius)
             if keys[pygame.K_UP]:
-                ball.VEL = 5
+                mass_balls[0].VEL = 5
 
-        ball.move()
-        ball_collision(ball)
-        ball_paddle_collision(ball, paddle)
-
+        # ball.move()
+        for x in mass_balls:
+            x.move()
+            ball_collision(x)
+            ball_paddle_collision(x, paddle)
+        # ball_collision(ball)
+        # ball_paddle_collision(ball, paddle)
 
         for brick in all_sprites:
-            brick.collide(ball)
+            for tekBall in mass_balls:
+                brick.collide(tekBall)
 
             if brick.health <= 0:
                 all_sprites.remove(brick)
+
+                bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"), mass_balls)
+                print(mass_balls)
                 brick.update()
 
-        if ball.y + ball.radius >= HEIGHT:
-            lives -= 1
-            # центровка площади после потери жизни
-            # paddle.rect.centerx = WIDTH // 2
-            ball.set_positions(paddle.rect.centerx, paddle.rect.y - ball.radius)
-            ball.VEL = 0
-            ball.set_vel(0, ball.VEL * -1)
-
-
-
-
+        ball_floor_collision(mass_balls, paddle)
 
         if lives <= 0:
             generate_bricks()
@@ -303,11 +312,8 @@ def main():
             lives = 3
             reset()
             display_text("You Won!")
-            print(ball.y)
 
-
-
-        draw(win, paddle_sprite, ball, all_sprites, lives, background_img)
+        draw(win, paddle_sprite, mass_balls, all_sprites, lives, background_img)
 
     pygame.quit()
     quit()
@@ -315,4 +321,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
