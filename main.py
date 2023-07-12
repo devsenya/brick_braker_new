@@ -8,6 +8,7 @@ import os
 from level_1 import levels
 from brick_types import brick_type
 
+
 class Paddle(pygame.sprite.Sprite):
     VEL = 10
 
@@ -54,6 +55,10 @@ class Ball:
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
+    def set_speed(self, speed):
+        self.VEL = speed
+
+
 
 def ball_floor_collision(balls, paddle):
     global lives
@@ -76,7 +81,7 @@ def bonus_plus_ball(ball, mass):
 
 
 class Brick(pygame.sprite.Sprite):
-    def __init__(self, x, y, typeB:dict):
+    def __init__(self, x, y, typeB: dict):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         self.name = typeB["type"]
@@ -236,6 +241,7 @@ paddle_sprite = pygame.sprite.Group()
 mass_balls = []
 lives = 3
 
+
 def main():
     global lives
     clock = pygame.time.Clock()
@@ -246,14 +252,11 @@ def main():
     generate_bricks()
     paddle_sprite.add(paddle)
 
-
-
     def reset():
         global mass_balls
         mass_balls = mass_balls[:1]
         mass_balls[0].set_positions(paddle.rect.centerx, paddle.rect.y - mass_balls[0].radius)
         mass_balls[0].VEL = 0
-
 
     def display_text(text):
         text_render = LIVES_FONT.render(text, 1, "red")
@@ -295,17 +298,25 @@ def main():
         for brick in all_sprites:
             for tekBall in mass_balls:
                 brick.collide(tekBall)
+                # тут мы знаем какой фарик ударил по кирпичику
 
             if brick.health <= 0:
                 all_sprites.remove(brick)
 
                 if brick.name == "bonus_pb":
-                    bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"), mass_balls)
+                    bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"),
+                                    mass_balls)
 
-                print(mass_balls)
+                for tekBall in mass_balls:
+                    tekBall.set_speed(15)
+                print("Увеличил скорость")
+
+                # print(mass_balls)
                 brick.update()
 
+
         ball_floor_collision(mass_balls, paddle)
+
 
         if lives <= 0:
             generate_bricks()
