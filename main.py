@@ -186,11 +186,11 @@ def ball_paddle_collision(ball, paddle):
 
 
 def generate_bricks():
-    brick = Brick(0, 0, brick_type("classic"))
+    brick = Brick(0, 0, brick_type(1))
     width = brick.width
     height = brick.height
     windowSize = pygame.display.get_window_size()
-    bricksMap = levels(3)
+    bricksMap = levels(2)
     cols = len(bricksMap[0])
     rows = len(bricksMap)
     gap = (windowSize[0] - (width * cols)) // (cols + 1)
@@ -203,7 +203,7 @@ def generate_bricks():
             x = gap + col * (width + gap)
             y = 5 + row * (height + 5)
             if bricksMap[row][col]:
-                brick = Brick(x, y, brick_type("bonus_pb"))
+                brick = Brick(x, y, brick_type(bricksMap[row][col]))
                 all_sprites.add(brick)
 
             print(x, y)
@@ -221,7 +221,7 @@ background_img = pygame.image.load(os.path.join(img_folder, 'back2.png'))
 
 pygame.init()
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1200, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("brick breaker")
 
@@ -299,7 +299,9 @@ def main():
             if brick.health <= 0:
                 all_sprites.remove(brick)
 
-                bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"), mass_balls)
+                if brick.name == "bonus_pb":
+                    bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"), mass_balls)
+
                 print(mass_balls)
                 brick.update()
 
