@@ -6,7 +6,7 @@ import pygame
 import os
 
 from level_1 import levels
-
+from brick_types import brick_type
 
 class Paddle(pygame.sprite.Sprite):
     VEL = 10
@@ -76,12 +76,12 @@ def bonus_plus_ball(ball, mass):
 
 
 class Brick(pygame.sprite.Sprite):
-    def __init__(self, x, y, health):
+    def __init__(self, x, y, typeB:dict):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('img/bricks/brick1.png')
         self.images = []
-        self.images.append(pygame.image.load('img/bricks/brick1.png'))
-        self.images.append(pygame.image.load('img/bricks/brick2.png'))
+        self.name = typeB["type"]
+        for i in typeB["images"]:
+            self.images.append(pygame.image.load(i))
         self.index = 0
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
@@ -91,8 +91,8 @@ class Brick(pygame.sprite.Sprite):
 
         self.width = self.rect[2]
         self.height = self.rect[3]
-        self.health = health
-        self.max_health = health
+        self.health = typeB["health"]
+        self.max_health = self.health
 
         self.rect.center = (x + self.width // 2, y + self.height // 2)
 
@@ -186,7 +186,7 @@ def ball_paddle_collision(ball, paddle):
 
 
 def generate_bricks():
-    brick = Brick(0, 0, 0)
+    brick = Brick(0, 0, brick_type("classic"))
     width = brick.width
     height = brick.height
     windowSize = pygame.display.get_window_size()
@@ -203,7 +203,7 @@ def generate_bricks():
             x = gap + col * (width + gap)
             y = 5 + row * (height + 5)
             if bricksMap[row][col]:
-                brick = Brick(x, y, 2)
+                brick = Brick(x, y, brick_type("bonus_pb"))
                 all_sprites.add(brick)
 
             print(x, y)
@@ -247,9 +247,13 @@ def main():
     paddle_sprite.add(paddle)
 
 
+
     def reset():
+        global mass_balls
+        mass_balls = mass_balls[:1]
         mass_balls[0].set_positions(paddle.rect.centerx, paddle.rect.y - mass_balls[0].radius)
         mass_balls[0].VEL = 0
+
 
     def display_text(text):
         text_render = LIVES_FONT.render(text, 1, "red")
