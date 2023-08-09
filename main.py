@@ -37,11 +37,11 @@ class Ball:
         self.color = color
         self.x_vel = 0
         self.VEL = 5
-        self.y_vel = -self.VEL
+        self.y_vel = -1
 
     def move(self):
-        self.x += self.x_vel
-        self.y += self.y_vel
+        self.x += self.x_vel * self.VEL
+        self.y += self.y_vel * self.VEL
 
     def set_vel(self, x_vel, y_vel):
         self.x_vel = x_vel
@@ -105,7 +105,7 @@ class Brick(pygame.sprite.Sprite):
     def collide(self, ball):
         if (self.rect.y < ball.y - ball.radius <= self.rect.y + self.height) and (
                 self.rect.x - ball.radius < ball.x < self.rect.x + self.width + ball.radius):
-            print(" удар снизу")
+            # print(" удар снизу")
             self.hit()
             ball.set_positions(ball.x, ball.y + ball.VEL)
             ball.set_vel(ball.x_vel, ball.y_vel * -1)
@@ -113,19 +113,19 @@ class Brick(pygame.sprite.Sprite):
         # удар справа
         if (ball.x + ball.radius >= self.rect.x) and (ball.x + ball.radius < self.rect.x + self.width) and (
                 self.rect.y < ball.y < self.rect.y + self.height):
-            print(" удар справа")
+            # print(" удар справа")
             self.hit()
             ball.set_vel(ball.x_vel * -1, ball.y_vel)
             return True
         if (ball.x - ball.radius <= self.rect.x + self.width) and (ball.x - ball.radius > self.rect.x) and (
                 self.rect.y < ball.y < self.rect.y + self.height):
-            print(" удар слева")
+            # print(" удар слева")
             self.hit()
             ball.set_vel(ball.x_vel * -1, ball.y_vel)
             return True
         if (self.rect.y <= ball.y + ball.radius < self.rect.y + self.height) and (
                 self.rect.x - ball.radius < ball.x < self.rect.x + self.width + ball.radius):
-            print(" удар сверху")
+            # print(" удар сверху")
             self.hit()
             ball.set_positions(ball.x, ball.y - ball.VEL)
             ball.set_vel(ball.x_vel, ball.y_vel * -1)
@@ -178,8 +178,8 @@ def ball_paddle_collision(ball, paddle):
     percent_width = distance_to_center / paddle.width
     angle = percent_width * 90
     angle_radians = math.radians(angle)
-    x_vel = math.sin(angle_radians) * ball.VEL
-    y_vel = math.cos(angle_radians) * ball.VEL * -1
+    x_vel = math.sin(angle_radians)
+    y_vel = math.cos(angle_radians) * -1
     # когда шарик касается площадки или появляется на ней, направление становится вертикальным
     # можно разбить на 2 функции(коллизия с площадкой и просчет направления)
     ball.set_vel(x_vel, y_vel)
@@ -270,6 +270,10 @@ def main():
                 break
 
         keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            for x in mass_balls:
+                x.VEL = 10
+                print(x.x_vel, x.y_vel)
 
         if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_UP]:
 
@@ -279,7 +283,6 @@ def main():
                 paddle.move(1)
             # если скорость = 0 -> следуем за paddle
             if len(mass_balls) == 1 and mass_balls[0].VEL == 0:
-                print("sdfsdfsdfsdfsdfsdfsdfdfsdf")
                 mass_balls[0].set_positions(paddle.rect.centerx, paddle.rect.y - mass_balls[0].radius)
             if keys[pygame.K_UP]:
                 mass_balls[0].VEL = 5
@@ -302,7 +305,7 @@ def main():
                 if brick.name == "bonus_pb":
                     bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"), mass_balls)
 
-                print(mass_balls)
+                # print(mass_balls)
                 brick.update()
 
         ball_floor_collision(mass_balls, paddle)
