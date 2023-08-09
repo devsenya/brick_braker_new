@@ -1,5 +1,5 @@
-def levels(levelNum: int) -> list:
-    match levelNum:
+def levels(level_num: int) -> list:
+    match level_num:
         case 1:
             return [
                 [0] * 8,
