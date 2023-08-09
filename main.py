@@ -31,13 +31,13 @@ class Paddle(pygame.sprite.Sprite):
 
 class Ball:
 
-    def __init__(self, x, y, radius, color):
+    def __init__(self, x, y, radius, color, speed):
         self.x = x
         self.y = y
         self.radius = radius
         self.color = color
         self.x_vel = 0
-        self.VEL = 5
+        self.VEL = speed
         self.y_vel = -1
 
     def move(self):
@@ -66,8 +66,9 @@ def ball_floor_collision(balls, paddle):
                 # центровка площади после потери жизни
                 # paddle.rect.centerx = WIDTH // 2
 
-                bonus_plus_ball(ball := Ball(paddle.rect.centerx, paddle.rect.y - ball.radius, BALL_RADIUS, "white"),
-                                mass_balls)
+                bonus_plus_ball(
+                    ball := Ball(paddle.rect.centerx, paddle.rect.y - ball.radius, BALL_RADIUS, "white", BALL_SPEED),
+                    mass_balls)
                 ball.VEL = 0
                 ball.set_vel(0, ball.VEL * -1)
 
@@ -228,6 +229,7 @@ pygame.display.set_caption("brick breaker")
 
 FPS = 60
 BALL_RADIUS = 10
+BALL_SPEED = 5
 
 LIVES_FONT = pygame.font.SysFont("comicsans", 40)
 
@@ -239,12 +241,12 @@ lives = 3
 
 
 def main():
-    global lives
+    global lives, BALL_SPEED
     clock = pygame.time.Clock()
 
     paddle = Paddle()
 
-    mass_balls.append(Ball(WIDTH / 2, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"))
+    mass_balls.append(Ball(WIDTH / 2, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white", BALL_SPEED))
     generate_bricks()
     paddle_sprite.add(paddle)
 
@@ -269,9 +271,18 @@ def main():
                 break
 
         keys = pygame.key.get_pressed()
+
+        # если я нажал пробел, я меняю искорость для новых шариков и обновляю скорость текущих
         if keys[pygame.K_SPACE]:
+            BALL_SPEED = 10
             for x in mass_balls:
-                x.VEL = 10
+                x.VEL = BALL_SPEED
+                print(x.x_vel, x.y_vel)
+
+        if keys[pygame.K_c]:
+            BALL_SPEED = 2
+            for x in mass_balls:
+                x.VEL = BALL_SPEED
                 print(x.x_vel, x.y_vel)
 
         if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_UP]:
@@ -303,8 +314,9 @@ def main():
                 all_sprites.remove(brick)
 
                 if brick.name == "bonus_pb":
-                    bonus_plus_ball(Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white"),
-                                    mass_balls)
+                    bonus_plus_ball(
+                        Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white", BALL_SPEED),
+                        mass_balls)
 
                 # print(mass_balls)
                 brick.update()
