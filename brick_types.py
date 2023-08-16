@@ -10,6 +10,11 @@ types = {
         "type": "bonus_pb",
         "health": 1,
         "images": ['img/bricks/brickPB.png']
+    },
+    3: {
+        "type": "bonus_ps",
+        "health": 1,
+        "images": ['img/bricks/brickPS.png']
     }
 }
 
