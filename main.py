@@ -185,7 +185,18 @@ def ball_paddle_collision(ball, paddle):
     # когда шарик касается площадки или появляется на ней, направление становится вертикальным
     # можно разбить на 2 функции(коллизия с площадкой и просчет направления)
     ball.set_vel(x_vel, y_vel)
-
+# def bonus_plus_speed(BALL_SPEED):
+#     BALL_SPEED = 10
+#     for x in mass_balls:
+#         x.VEL = BALL_SPEED
+    # run = True
+    #
+    # while run:
+    #     clock.tick(FPS)
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             run = False
+    #             break
 
 def generate_bricks():
     brick = Brick(0, 0, brick_type(1))
@@ -262,6 +273,9 @@ def main():
         pygame.display.update()
         pygame.time.delay(3000)
 
+
+
+
     run = True
     while run:
         clock.tick(FPS)
@@ -308,17 +322,25 @@ def main():
         for brick in all_sprites:
             for tekBall in mass_balls:
                 brick.collide(tekBall)
-                # тут мы знаем какой фарик ударил по кирпичику
+                # тут мы знаем какой фарик ударил по кирпичик
 
             if brick.health <= 0:
                 all_sprites.remove(brick)
+
+                if brick.name == "bonus_ps":
+                    if BALL_SPEED != 10:
+                        BALL_SPEED = 10
+                        for x in mass_balls:
+                            x.VEL = BALL_SPEED
+                            print(x.x_vel, x.y_vel)
+
 
                 if brick.name == "bonus_pb":
                     bonus_plus_ball(
                         Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white", BALL_SPEED),
                         mass_balls)
 
-                # print(mass_balls)
+
                 brick.update()
 
         ball_floor_collision(mass_balls, paddle)
