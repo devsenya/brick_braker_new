@@ -57,7 +57,7 @@ class Ball:
 
 
 def ball_floor_collision(balls, paddle):
-    global lives
+    global lives, BALL_SPEED
     for ball in balls:
         if ball.y + ball.radius >= HEIGHT:
             balls.remove(ball)
@@ -65,12 +65,12 @@ def ball_floor_collision(balls, paddle):
                 lives -= 1
                 # центровка площади после потери жизни
                 # paddle.rect.centerx = WIDTH // 2
-
+                BALL_SPEED = 5
                 bonus_plus_ball(
                     ball := Ball(paddle.rect.centerx, paddle.rect.y - ball.radius, BALL_RADIUS, "white", BALL_SPEED),
                     mass_balls)
-                ball.VEL = 0
-                ball.set_vel(0, ball.VEL * -1)
+                # ball.VEL = 0
+                # ball.set_vel(0, ball.VEL * -1)
 
 
 def bonus_plus_ball(ball, mass):
