@@ -64,8 +64,8 @@ def ball_floor_collision(balls, paddle):
             if len(balls) <= 0:
                 lives -= 1
                 # центровка площади после потери жизни
-                # paddle.rect.centerx = WIDTH // 2
-                BALL_SPEED = 5
+                paddle.rect.centerx = WIDTH // 2
+                BALL_SPEED = 0
                 bonus_plus_ball(
                     ball := Ball(paddle.rect.centerx, paddle.rect.y - ball.radius, BALL_RADIUS, "white", BALL_SPEED),
                     mass_balls)
@@ -185,25 +185,16 @@ def ball_paddle_collision(ball, paddle):
     # когда шарик касается площадки или появляется на ней, направление становится вертикальным
     # можно разбить на 2 функции(коллизия с площадкой и просчет направления)
     ball.set_vel(x_vel, y_vel)
-# def bonus_plus_speed(BALL_SPEED):
-#     BALL_SPEED = 10
-#     for x in mass_balls:
-#         x.VEL = BALL_SPEED
-    # run = True
-    #
-    # while run:
-    #     clock.tick(FPS)
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             run = False
-    #             break
 
-def generate_bricks():
-    brick = Brick(0, 0, brick_type(1))
-    width = brick.width
-    height = brick.height
+def generate_bricks(bricksMapLevel:list):
+    # brick = Brick(0, 0, brick_type(1))
+    # width = brick.width
+    # height = brick.height
+    width = 91
+    height = 26
+
     windowSize = pygame.display.get_window_size()
-    bricksMap = levels(2)
+    bricksMap = bricksMapLevel
     cols = len(bricksMap[0])
     rows = len(bricksMap)
     gap = (windowSize[0] - (width * cols)) // (cols + 1)
@@ -230,7 +221,8 @@ game_folder = os.path.dirname(__file__)
 
 img_folder = os.path.join(game_folder, 'img')
 
-background_img = pygame.image.load(os.path.join(img_folder, 'back2.png'))
+LEVEL = 1
+
 
 pygame.init()
 
@@ -252,13 +244,13 @@ lives = 3
 
 
 def main():
-    global lives, BALL_SPEED
+    global lives, BALL_SPEED, LEVEL
     clock = pygame.time.Clock()
-
+    background_img = pygame.image.load(os.path.join(img_folder, f'back{LEVEL}.png'))
     paddle = Paddle()
 
     mass_balls.append(Ball(WIDTH / 2, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white", BALL_SPEED))
-    generate_bricks()
+    generate_bricks(levels(LEVEL))
     paddle_sprite.add(paddle)
 
     def reset():
@@ -294,7 +286,7 @@ def main():
                 print(x.x_vel, x.y_vel)
 
         if keys[pygame.K_c]:
-            BALL_SPEED = 2
+            BALL_SPEED = 5
             for x in mass_balls:
                 x.VEL = BALL_SPEED
                 print(x.x_vel, x.y_vel)
@@ -309,20 +301,18 @@ def main():
             if len(mass_balls) == 1 and mass_balls[0].VEL == 0:
                 mass_balls[0].set_positions(paddle.rect.centerx, paddle.rect.y - mass_balls[0].radius)
             if keys[pygame.K_UP]:
-                mass_balls[0].VEL = 5
+                BALL_SPEED = 5
+                mass_balls[0].VEL = BALL_SPEED
 
-        # ball.move()
         for x in mass_balls:
             x.move()
             ball_collision(x)
             ball_paddle_collision(x, paddle)
-        # ball_collision(ball)
-        # ball_paddle_collision(ball, paddle)
 
         for brick in all_sprites:
             for tekBall in mass_balls:
                 brick.collide(tekBall)
-                # тут мы знаем какой фарик ударил по кирпичик
+                # тут мы знаем какой шарик ударил по кирпичику
 
             if brick.health <= 0:
                 all_sprites.remove(brick)
@@ -334,25 +324,26 @@ def main():
                             x.VEL = BALL_SPEED
                             print(x.x_vel, x.y_vel)
 
-
                 if brick.name == "bonus_pb":
                     bonus_plus_ball(
                         Ball(paddle.rect.centerx, paddle.rect.y - BALL_RADIUS, BALL_RADIUS, "white", BALL_SPEED),
                         mass_balls)
-
-
                 brick.update()
 
         ball_floor_collision(mass_balls, paddle)
 
         if lives <= 0:
-            generate_bricks()
+            LEVEL = 1
+            background_img = pygame.image.load(os.path.join(img_folder, f'back{LEVEL}.png'))
+            generate_bricks(levels(LEVEL))
             lives = 3
             reset()
             display_text("You Lost!")
 
         if len(all_sprites) == 0:
-            generate_bricks()
+            LEVEL += 1
+            background_img = pygame.image.load(os.path.join(img_folder, f'back{LEVEL}.png'))
+            generate_bricks(levels(LEVEL))
             lives = 3
             reset()
             display_text("You Won!")
