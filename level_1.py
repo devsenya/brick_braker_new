@@ -2,11 +2,11 @@ def levels(level_num: int) -> list:
     match level_num:
         # case 1:
         #     return [
-        #         [0] * 8,
+        #         # [0] * 8,
         #         [1] * 8,
-        #         [0] * 8,
+        #         # [0] * 8,
         #         [1] * 8,
-        #         [0] * 8,
+        #         # [0] * 8,
         #         [1] * 8
         #     ]
         case 1:

@@ -25,6 +25,19 @@ class Paddle(pygame.sprite.Sprite):
         paddle_sprite.update()
         paddle_sprite.draw(win)
 
+    def scale_plus(self):
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() * 1.5, self.image.get_height()))
+        self.rect = self.image.get_rect()
+        self.width = self.rect[2]
+        self.rect.center = (WIDTH // 2, HEIGHT - self.height)
+
+    def scale_minus(self):
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() // 1.5, self.image.get_height()))
+        self.rect = self.image.get_rect()
+        self.width = self.rect[2]
+        self.rect.center = (WIDTH // 2, HEIGHT - self.height)
+
+
     def move(self, direction=1):
         self.rect.x = self.rect.x + self.VEL * direction
 
@@ -75,6 +88,8 @@ def ball_floor_collision(balls, paddle):
 
 def bonus_plus_ball(ball, mass):
     mass.append(ball)
+
+
 
 
 class Brick(pygame.sprite.Sprite):
@@ -244,7 +259,7 @@ lives = 3
 
 
 def main():
-    global lives, BALL_SPEED, LEVEL
+    global lives, BALL_SPEED, LEVEL, scale_plus, scale_minus
     clock = pygame.time.Clock()
     background_img = pygame.image.load(os.path.join(img_folder, f'back{LEVEL}.png'))
     paddle = Paddle()
@@ -267,7 +282,7 @@ def main():
 
 
 
-
+    # scale = False
     run = True
     while run:
         clock.tick(FPS)
@@ -277,6 +292,11 @@ def main():
                 break
 
         keys = pygame.key.get_pressed()
+
+        # if keys[pygame.K_s] and not scale:
+        #     paddle.scale_minus()
+        #     scale = True
+
 
         # если я нажал пробел, я меняю искорость для новых шариков и обновляю скорость текущих
         if keys[pygame.K_SPACE]:
@@ -316,6 +336,12 @@ def main():
 
             if brick.health <= 0:
                 all_sprites.remove(brick)
+
+                if brick.name == "bonus_sp":
+                    scale_plus()
+
+                if brick.name == "bonus_sm":
+                    scale_minus()
 
                 if brick.name == "bonus_ps":
                     if BALL_SPEED != 10:
