@@ -26,16 +26,18 @@ class Paddle(pygame.sprite.Sprite):
         paddle_sprite.draw(win)
 
     def scale_plus(self):
+        center = self.rect.center
         self.image = pygame.transform.scale(self.image, (self.image.get_width() * 1.5, self.image.get_height()))
         self.rect = self.image.get_rect()
         self.width = self.rect[2]
-        self.rect.center = (WIDTH // 2, HEIGHT - self.height)
+        self.rect.center = center
 
     def scale_minus(self):
+        center = self.rect.center
         self.image = pygame.transform.scale(self.image, (self.image.get_width() // 1.5, self.image.get_height()))
         self.rect = self.image.get_rect()
         self.width = self.rect[2]
-        self.rect.center = (WIDTH // 2, HEIGHT - self.height)
+        self.rect.center = center
 
 
     def move(self, direction=1):
@@ -282,7 +284,7 @@ def main():
 
 
 
-    # scale = False
+    scale = False
     run = True
     while run:
         clock.tick(FPS)
@@ -293,10 +295,12 @@ def main():
 
         keys = pygame.key.get_pressed()
 
-        # if keys[pygame.K_s] and not scale:
-        #     paddle.scale_minus()
-        #     scale = True
-
+        if keys[pygame.K_s] and not scale:
+            paddle.scale_minus()
+            scale = True
+        if keys[pygame.K_w] and scale:
+            paddle.scale_plus()
+            scale = False
 
         # если я нажал пробел, я меняю искорость для новых шариков и обновляю скорость текущих
         if keys[pygame.K_SPACE]:
